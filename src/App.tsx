@@ -32,11 +32,8 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { OrderTrackingModal } from './components/tracking/OrderTrackingModal';
 import { useConfigurator } from './store/useConfigurator';
 import {
-  Shirt,
   CheckCircle2,
-  ChevronRight,
-  EyeOff,
-  Maximize2
+  EyeOff
 } from 'lucide-react';
 
 export default function App() {
@@ -482,35 +479,14 @@ export default function App() {
               className="w-full h-full"
             />
 
-            {/* FLOATING MODEL & SIZE CAPSULE (Hidden in Zen Mode) */}
-            {!isZenMode && (
-              <div className="absolute top-5 left-5 z-20 hidden sm:block">
-                <button
-                  onClick={() => setIsArticleDrawerOpen(true)}
-                  className="flex items-center gap-2.5 px-3.5 py-2 bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-sm hover:bg-white transition-all text-xs group"
-                >
-                  <div className="w-6 h-6 rounded-lg bg-slate-900 text-white flex items-center justify-center">
-                    <Shirt className="w-3.5 h-3.5" />
-                  </div>
-                  <div className="text-left">
-                    <span className="font-bold text-slate-900 block leading-tight">
-                      {selectedArticle.name}
-                    </span>
-                    <span className="text-[11px] text-slate-500">
-                      Taille : <strong className="text-slate-800">{selectedSize}</strong>
-                    </span>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
-                </button>
-              </div>
-            )}
+
 
             {/* FLOATING AI GENERATOR PANEL */}
             {showAiPanel && !isZenMode && <AiPanel onClose={() => setShowAiPanel(false)} />}
 
             {/* FLOATING BOTTOM DOCK (Hidden in Zen Mode) */}
             {!isZenMode && (
-              <div className="absolute bottom-5 inset-x-4 z-20 flex justify-center pointer-events-auto">
+              <div className="absolute bottom-2 sm:bottom-4 inset-x-2 sm:inset-x-4 z-20 flex justify-center pointer-events-auto">
                 <StudioBottomDock
                   article={selectedArticle}
                   selectedColor={selectedColor}
@@ -518,6 +494,7 @@ export default function App() {
                   selectedSize={selectedSize}
                   onSelectSize={setSelectedSize}
                   onOpenAi={() => setShowAiPanel(!showAiPanel)}
+                  onOpenArticleDrawer={() => setIsArticleDrawerOpen(true)}
                   price={livePricing.unitPrice}
                   quantity={orderQuantity}
                   onUpdateQuantity={setOrderQuantity}
@@ -555,7 +532,7 @@ export default function App() {
           </div>
         ) : (
           /* 2D PRECISION CANVAS MODE */
-          <div className="relative w-full h-full flex flex-col items-center justify-center p-4">
+          <div className="relative w-full h-full flex flex-col items-center justify-center p-2 sm:p-4 pb-36 sm:pb-32">
             <CanvasEditor2D
               article={selectedArticle}
               color={selectedColor}
@@ -571,7 +548,7 @@ export default function App() {
             />
 
             {/* FLOATING BOTTOM DOCK IN 2D */}
-            <div className="absolute bottom-5 inset-x-4 z-20 flex justify-center pointer-events-auto">
+            <div className="absolute bottom-2 sm:bottom-4 inset-x-2 sm:inset-x-4 z-20 flex justify-center pointer-events-auto">
               <StudioBottomDock
                 article={selectedArticle}
                 selectedColor={selectedColor}
@@ -579,6 +556,7 @@ export default function App() {
                 selectedSize={selectedSize}
                 onSelectSize={setSelectedSize}
                 onOpenAi={() => setShowAiPanel(!showAiPanel)}
+                onOpenArticleDrawer={() => setIsArticleDrawerOpen(true)}
                 price={livePricing.unitPrice}
                 quantity={orderQuantity}
                 onUpdateQuantity={setOrderQuantity}

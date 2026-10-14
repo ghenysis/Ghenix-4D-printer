@@ -39,3 +39,13 @@
 .animate-fade-in {
   animation: fadeIn 0.18s ease-out forwards;
 }
+
+/* Hide scrollbars for clean touch-scrolling carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+

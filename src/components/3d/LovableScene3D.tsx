@@ -483,14 +483,14 @@ export function LovableScene3D({
       </Canvas>
 
       {/* COMPACT SINGLE-LINE VISUALIZATION TOOLBAR */}
-      <div className="absolute top-4 inset-x-4 z-20 flex items-center justify-center pointer-events-none">
-        <div className="pointer-events-auto flex items-center gap-1.5 p-1 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-slate-200/90 max-w-full overflow-x-auto text-xs">
+      <div className="absolute top-4 inset-x-2 sm:inset-x-4 z-20 flex items-center justify-center pointer-events-none">
+        <div className="pointer-events-auto flex items-center gap-1 sm:gap-1.5 p-1 bg-white/95 backdrop-blur-xl rounded-2xl shadow-lg border border-slate-200/90 max-w-[calc(100vw-20px)] overflow-x-auto no-scrollbar text-xs">
           {/* Face switcher */}
-          <div className="flex items-center bg-slate-100 p-0.5 rounded-xl">
+          <div className="flex items-center bg-slate-100 p-0.5 rounded-xl shrink-0">
             <button
               onClick={() => setSide('front')}
               disabled={isAutoRotate}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all disabled:opacity-40 ${
+              className={`px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all disabled:opacity-40 ${
                 side === 'front'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -501,7 +501,7 @@ export function LovableScene3D({
             <button
               onClick={() => setSide('back')}
               disabled={isAutoRotate}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all disabled:opacity-40 ${
+              className={`px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg transition-all disabled:opacity-40 ${
                 side === 'back'
                   ? 'bg-slate-900 text-white shadow-xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -516,7 +516,7 @@ export function LovableScene3D({
           {/* 360 Auto-Rotate */}
           <button
             onClick={onToggleAutoRotate}
-            className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-xl transition-all shadow-2xs whitespace-nowrap ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 text-xs font-bold rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 ${
               isAutoRotate
                 ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-400/50'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
@@ -524,13 +524,13 @@ export function LovableScene3D({
             title={isAutoRotate ? 'Arrêter la rotation 360°' : 'Lancer la rotation 360°'}
           >
             <RotateCcw className={`w-3.5 h-3.5 ${isAutoRotate ? 'animate-spin' : ''}`} />
-            <span>{isAutoRotate ? '360°' : '360°'}</span>
+            <span>360°</span>
           </button>
 
           {/* Wind Effect */}
           <button
             onClick={onToggleWind}
-            className={`flex items-center gap-1.5 px-3 py-1 text-xs font-semibold rounded-xl transition-all shadow-2xs whitespace-nowrap ${
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 text-xs font-semibold rounded-xl transition-all shadow-2xs whitespace-nowrap shrink-0 ${
               isWindActive
                 ? 'bg-slate-900 text-amber-400'
                 : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
@@ -544,11 +544,11 @@ export function LovableScene3D({
           {/* Reset Camera View */}
           <button
             onClick={handleResetView}
-            className="flex items-center gap-1 px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all whitespace-nowrap"
+            className="flex items-center gap-1 px-2 sm:px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all whitespace-nowrap shrink-0"
             title="Réinitialiser la caméra et la vue"
           >
             <Compass className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Recentrer</span>
+            <span className="hidden xs:inline">Recentrer</span>
           </button>
 
           <div className="w-[1px] h-5 bg-slate-200 shrink-0" />
@@ -556,7 +556,7 @@ export function LovableScene3D({
           {/* Zen / Full Preview Mode */}
           <button
             onClick={toggleZen}
-            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-xl transition-all whitespace-nowrap ${
+            className={`flex items-center gap-1 px-2 sm:px-2.5 py-1 text-xs font-medium rounded-xl transition-all whitespace-nowrap shrink-0 ${
               zenMode
                 ? 'bg-amber-500 text-slate-950 font-bold'
                 : 'text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200'
@@ -564,14 +564,14 @@ export function LovableScene3D({
             title={zenMode ? 'Quitter le mode aperçu' : 'Aperçu plein écran sans outils'}
           >
             <Maximize2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{zenMode ? 'Normal' : 'Aperçu'}</span>
+            <span className="hidden xs:inline">{zenMode ? 'Normal' : 'Aperçu'}</span>
           </button>
         </div>
       </div>
 
       {/* BOTTOM-RIGHT QUICK NAVIGATION TOOLBAR (ZOOM / PAN HELPER) */}
-      <div className="absolute bottom-5 right-5 z-20 flex flex-col items-end gap-1.5 pointer-events-none">
-        <div className="pointer-events-auto flex items-center bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-1 gap-0.5">
+      <div className="absolute bottom-28 sm:bottom-24 md:bottom-20 right-3 sm:right-5 z-20 flex flex-col items-end gap-1.5 pointer-events-none">
+        <div className="pointer-events-auto flex items-center bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-slate-200/80 p-0.5 sm:p-1 gap-0.5">
           <button
             onClick={() => {
               const canvas = canvasRef.current;
@@ -580,8 +580,8 @@ export function LovableScene3D({
                 canvas.dispatchEvent(new WheelEvent('wheel', { deltaY: -120, bubbles: true }));
               }
             }}
-            className="p-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl transition-all"
-            title="Zoom avant (Molette vers le haut)"
+            className="p-1.5 sm:p-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl transition-all"
+            title="Zoom avant"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
@@ -594,13 +594,13 @@ export function LovableScene3D({
                 canvas.dispatchEvent(new WheelEvent('wheel', { deltaY: 120, bubbles: true }));
               }
             }}
-            className="p-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl transition-all"
-            title="Zoom arrière (Molette vers le bas)"
+            className="p-1.5 sm:p-2 text-slate-700 hover:text-slate-950 hover:bg-slate-100 rounded-xl transition-all"
+            title="Zoom arrière"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
         </div>
-        <div className="px-2.5 py-1 bg-slate-900/60 backdrop-blur-md text-white/90 text-[10px] font-medium rounded-full shadow-xs">
+        <div className="hidden sm:block px-2.5 py-1 bg-slate-900/60 backdrop-blur-md text-white/90 text-[10px] font-medium rounded-full shadow-xs">
           Molette : zoomer • Clic droit : déplacer • Clic gauche : pivoter
         </div>
       </div>
