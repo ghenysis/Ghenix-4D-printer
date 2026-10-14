@@ -17,18 +17,24 @@ import {
   Sparkles
 } from 'lucide-react';
 
+import { UserProfile } from '../../types/auth';
+
 interface SaveModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentDesign: CustomDesign;
   onLoadDesign: (design: CustomDesign) => void;
+  currentUser?: UserProfile | null;
+  onRequestAuth?: (reason: 'save') => void;
 }
 
 export const SaveModal: React.FC<SaveModalProps> = ({
   isOpen,
   onClose,
   currentDesign,
-  onLoadDesign
+  onLoadDesign,
+  currentUser,
+  onRequestAuth
 }) => {
   const [designs, setDesigns] = useState<CustomDesign[]>([]);
   const [designName, setDesignName] = useState(currentDesign.name || 'Ma Création Ghenix');
@@ -44,6 +50,11 @@ export const SaveModal: React.FC<SaveModalProps> = ({
   if (!isOpen) return null;
 
   const handleSave = () => {
+    if (!currentUser && onRequestAuth) {
+      onRequestAuth('save');
+      return;
+    }
+
     const toSave: CustomDesign = {
       ...currentDesign,
       name: designName.trim() || 'Création sans titre'

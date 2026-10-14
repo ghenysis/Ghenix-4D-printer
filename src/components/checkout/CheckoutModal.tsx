@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { CartItem, CustomerDetails, Order } from '../../types';
 import { addOrder, generateOrderReference } from '../../services/storage';
+import { UserProfile } from '../../types/auth';
 import {
   X,
   CheckCircle2,
@@ -15,7 +16,8 @@ import {
   ShieldCheck,
   FileText,
   Clock,
-  Printer
+  Printer,
+  Sparkles
 } from 'lucide-react';
 
 interface CheckoutModalProps {
@@ -23,6 +25,8 @@ interface CheckoutModalProps {
   onClose: () => void;
   cartItems: CartItem[];
   onOrderSuccess: (order: Order) => void;
+  currentUser?: UserProfile | null;
+  onRequestAuth?: (reason: 'order') => void;
 }
 
 type CheckoutStep = 'review' | 'details' | 'shipping' | 'confirmation';
@@ -31,14 +35,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   isOpen,
   onClose,
   cartItems,
-  onOrderSuccess
+  onOrderSuccess,
+  currentUser,
+  onRequestAuth
 }) => {
   const [step, setStep] = useState<CheckoutStep>('review');
   const [customer, setCustomer] = useState<CustomerDetails>({
-    fullName: '',
-    email: '',
-    phone: '',
-    company: '',
+    fullName: currentUser?.name || '',
+    email: currentUser?.email || '',
+    phone: currentUser?.phone || '',
+    company: currentUser?.company || '',
     deliveryMethod: 'workshop_pickup',
     address: {
       street: '',
@@ -48,6 +54,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     },
     notes: ''
   });
+
+  // Auto populate customer details when user logs in
+  useEffect(() => {
+    if (currentUser) {
+      setCustomer((prev) => ({
+        ...prev,
+        fullName: prev.fullName || currentUser.name,
+        email: prev.email || currentUser.email,
+        phone: prev.phone || currentUser.phone || '',
+        company: prev.company || currentUser.company || ''
+      }));
+    }
+  }, [currentUser, isOpen]);
   const [confirmedOrder, setConfirmedOrder] = useState<Order | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -191,9 +210,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           {/* --- STEP 2: CUSTOMER DETAILS --- */}
           {step === 'details' && (
             <div className="space-y-4">
-              <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">
-                Vos Coordonnées Professionnelles ou Particulier
-              </h4>
+              <div className="flex items-center justify-between">
+                <h4 className="font-bold text-slate-900 uppercase tracking-wider text-[11px]">
+                  Vos Coordonnées Professionnelles ou Particulier
+                </h4>
+                {!currentUser && onRequestAuth && (
+                  <button
+                    type="button"
+                    onClick={() => onRequestAuth('order')}
+                    className="text-[11px] text-amber-700 bg-amber-50 hover:bg-amber-100 font-bold px-2.5 py-1 rounded-lg border border-amber-200 flex items-center gap-1.5 transition-colors"
+                  >
+                    <Sparkles className="w-3 h-3 text-amber-600" />
+                    <span>Connexion rapide (1-clic)</span>
+                  </button>
+                )}
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>

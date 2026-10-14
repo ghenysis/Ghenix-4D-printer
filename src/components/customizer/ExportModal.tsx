@@ -24,8 +24,11 @@ import {
   ChevronRight,
   Maximize2,
   ShieldCheck,
-  Package
+  Package,
+  User,
+  Lock
 } from 'lucide-react';
+import { UserProfile } from '../../types/auth';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -36,6 +39,9 @@ interface ExportModalProps {
   backDesign: FaceDesign;
   selectedTechnique: PrintTechniqueId;
   get3DCaptureUrl?: () => string;
+  onOpenRenderEngine?: () => void;
+  currentUser?: UserProfile | null;
+  onRequestAuth?: (reason: 'download') => void;
 }
 
 type TabType = 'pack' | 'production' | 'mockups' | 'datasheet';
@@ -49,12 +55,23 @@ export const ExportModal: React.FC<ExportModalProps> = ({
   frontDesign,
   backDesign,
   selectedTechnique,
-  get3DCaptureUrl
+  get3DCaptureUrl,
+  onOpenRenderEngine,
+  currentUser,
+  onRequestAuth
 }) => {
   const [activeTab, setActiveTab] = useState<TabType>('pack');
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState<string | null>(null);
   const [exportSuccess, setExportSuccess] = useState<string | null>(null);
+
+  const checkAuthBeforeDownload = (): boolean => {
+    if (!currentUser && onRequestAuth) {
+      onRequestAuth('download');
+      return false;
+    }
+    return true;
+  };
 
   // Settings
   const [includePrintZoneGuide, setIncludePrintZoneGuide] = useState(false);
@@ -124,6 +141,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   // 1. Export individual production file
   const handleExportProduction = async (face: 'front' | 'back') => {
+    if (!checkAuthBeforeDownload()) return;
     setIsExporting(true);
     setExportProgress(`Génération du fichier d'impression ${face === 'front' ? 'Recto' : 'Verso'}...`);
     try {
@@ -147,6 +165,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   // 2. Export individual mockup
   const handleExportMockup = async (face: 'front' | 'back') => {
+    if (!checkAuthBeforeDownload()) return;
     setIsExporting(true);
     setExportProgress(`Rendu du mockup client ${face === 'front' ? 'Face' : 'Dos'}...`);
     try {
@@ -166,6 +185,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   // 3. Export 3D Snapshot
   const handleExport3DSnapshot = () => {
+    if (!checkAuthBeforeDownload()) return;
     if (!get3DCaptureUrl) return;
     try {
       const url = get3DCaptureUrl();
@@ -183,6 +203,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   // 4. Export JSON Tech Spec
   const handleExportTechSpecJSON = () => {
+    if (!checkAuthBeforeDownload()) return;
     const techData = {
       project: 'GHENIX ATELIER - Production Textile',
       date: new Date().toISOString(),
@@ -276,6 +297,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({
 
   // 5. Complete Production Bundle (Pack 1-Click)
   const handleExportCompleteBundle = async () => {
+    if (!checkAuthBeforeDownload()) return;
     setIsExporting(true);
     setExportProgress("Préparation de l'ensemble du dossier de fabrication...");
 
@@ -646,6 +668,29 @@ export const ExportModal: React.FC<ExportModalProps> = ({
                   Images haute définition prêtes pour le catalogue, les présentations clients ou le bon à tirer.
                 </p>
               </div>
+
+              {onOpenRenderEngine && (
+                <div className="p-3.5 bg-gradient-to-r from-slate-900 to-slate-800 rounded-2xl text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
+                    <div>
+                      <p className="text-xs font-bold">Studio de Mockups 3D & Accès API</p>
+                      <p className="text-[11px] text-slate-300">
+                        Générez automatiquement les 5 angles studio (Face, Dos, 3/4, Macro) et pilotez vos rendus par API.
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      onClose();
+                      onOpenRenderEngine();
+                    }}
+                    className="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition-all whitespace-nowrap shadow-xs"
+                  >
+                    Ouvrir le Moteur 3D
+                  </button>
+                </div>
+              )}
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 {/* MOCKUP FRONT */}

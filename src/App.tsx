@@ -30,6 +30,11 @@ import { ExportModal } from './components/customizer/ExportModal';
 import { SaveModal } from './components/customizer/SaveModal';
 import { AdminDashboard } from './components/admin/AdminDashboard';
 import { OrderTrackingModal } from './components/tracking/OrderTrackingModal';
+import { RenderEngineView } from './components/render-engine/RenderEngineView';
+import { LandingPage } from './components/landing/LandingPage';
+import { AuthModal, AuthReason } from './components/auth/AuthModal';
+import { UserProfile } from './types/auth';
+import { getCurrentUser, subscribeToAuth } from './services/authService';
 import { useConfigurator } from './store/useConfigurator';
 import {
   CheckCircle2,
@@ -37,6 +42,48 @@ import {
 } from 'lucide-react';
 
 export default function App() {
+  // Top-Level Application Navigation View (Default on launch: 'landing' page)
+  const [currentView, setCurrentView] = useState<'landing' | 'studio' | 'render-engine'>('landing');
+
+  // Authenticated User & Role Management
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(getCurrentUser);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authReason, setAuthReason] = useState<AuthReason>('general');
+  const [pendingAuthAction, setPendingAuthAction] = useState<(() => void) | null>(null);
+
+  useEffect(() => {
+    const unsub = subscribeToAuth((user) => {
+      setCurrentUser(user);
+    });
+    return () => unsub();
+  }, []);
+
+  const requireAuth = (reason: AuthReason, onPass?: () => void) => {
+    if (currentUser) {
+      if (reason === 'admin' && currentUser.role !== 'admin') {
+        setAuthReason('admin');
+        setPendingAuthAction(() => onPass || null);
+        setIsAuthModalOpen(true);
+        return false;
+      }
+      if (onPass) onPass();
+      return true;
+    }
+    setAuthReason(reason);
+    setPendingAuthAction(() => onPass || null);
+    setIsAuthModalOpen(true);
+    return false;
+  };
+
+  const handleAuthSuccess = (user: UserProfile) => {
+    setCurrentUser(user);
+    if (pendingAuthAction) {
+      const act = pendingAuthAction;
+      setPendingAuthAction(null);
+      act();
+    }
+  };
+
   // Catalog & Product Selection
   const [catalog, setCatalog] = useState<GarmentArticle[]>(getStoredCatalog);
   const [selectedArticle, setSelectedArticle] = useState<GarmentArticle>(catalog[0]);
@@ -434,6 +481,100 @@ export default function App() {
   const selectedElement =
     currentFaceDesign.elements.find((el) => el.id === selectedElementId) || null;
 
+  // 1. Landing Page Presentation View (App start)
+  if (currentView === 'landing') {
+    return (
+      <>
+        <LandingPage
+          currentUser={currentUser}
+          onOpenStudio={() => setCurrentView('studio')}
+          onOpenRenderEngine={() => setCurrentView('render-engine')}
+          onOpenAdmin={() => {
+            if (currentUser?.role === 'admin') {
+              setIsAdminOpen(true);
+            } else {
+              requireAuth('admin', () => setIsAdminOpen(true));
+            }
+          }}
+          onOpenAuth={(reason) => requireAuth(reason || 'general')}
+          onOpenTracking={() => setIsTrackingOpen(true)}
+        />
+
+        {/* WORKSHOP ADMIN CONSOLE */}
+        <AdminDashboard
+          isOpen={isAdminOpen}
+          onClose={() => setIsAdminOpen(false)}
+          currentUser={currentUser}
+          onOpenStudio={() => {
+            setIsAdminOpen(false);
+            setCurrentView('studio');
+          }}
+          onOpenRenderEngine={() => {
+            setIsAdminOpen(false);
+            setCurrentView('render-engine');
+          }}
+          onCatalogUpdated={(newCat) => {
+            setCatalog(newCat);
+            const current = newCat.find((a) => a.id === selectedArticle.id);
+            if (current) setSelectedArticle(current);
+          }}
+        />
+
+        {/* AUTH MODAL */}
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          reason={authReason}
+          onSuccess={handleAuthSuccess}
+        />
+
+        {/* ORDER TRACKING MODAL */}
+        <OrderTrackingModal
+          isOpen={isTrackingOpen}
+          onClose={() => setIsTrackingOpen(false)}
+        />
+      </>
+    );
+  }
+
+  // 2. Independent Fullscreen 3D Rendering Engine & API Viewport
+  if (currentView === 'render-engine') {
+    return (
+      <>
+        <RenderEngineView
+          onBackToAtelier={() => setCurrentView('studio')}
+          onBackToLanding={() => setCurrentView('landing')}
+          initialArtworkUrl={useConfigurator.getState().logos.front?.url}
+          initialColorHex={selectedColor.hex}
+        />
+
+        {/* AUTH MODAL */}
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          reason={authReason}
+          onSuccess={handleAuthSuccess}
+        />
+
+        {/* WORKSHOP ADMIN CONSOLE */}
+        <AdminDashboard
+          isOpen={isAdminOpen}
+          onClose={() => setIsAdminOpen(false)}
+          currentUser={currentUser}
+          onOpenStudio={() => {
+            setIsAdminOpen(false);
+            setCurrentView('studio');
+          }}
+          onCatalogUpdated={(newCat) => {
+            setCatalog(newCat);
+            const current = newCat.find((a) => a.id === selectedArticle.id);
+            if (current) setSelectedArticle(current);
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-100 text-slate-900 font-sans">
       {/* 1. TOP NAVBAR (Hidden in Zen Preview Mode) */}
@@ -445,8 +586,18 @@ export default function App() {
           onOpenCart={() => setIsCartOpen(true)}
           onOpenExport={() => setIsExportOpen(true)}
           onOpenSave={() => setIsSaveOpen(true)}
-          onOpenAdmin={() => setIsAdminOpen(true)}
+          onOpenAdmin={() => {
+            if (currentUser?.role === 'admin') {
+              setIsAdminOpen(true);
+            } else {
+              requireAuth('admin', () => setIsAdminOpen(true));
+            }
+          }}
           onOpenTracking={() => setIsTrackingOpen(true)}
+          onOpenRenderEngine={() => setCurrentView('render-engine')}
+          onBackToLanding={() => setCurrentView('landing')}
+          currentUser={currentUser}
+          onOpenAuth={(reason) => requireAuth(reason || 'general')}
           canUndo={historyIndex > 0}
           canRedo={historyIndex < history.length - 1}
           onUndo={handleUndo}
@@ -616,6 +767,8 @@ export default function App() {
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
         cartItems={cart}
+        currentUser={currentUser}
+        onRequestAuth={(reason) => requireAuth(reason)}
         onOrderSuccess={() => {
           setCart([]);
           saveCart([]);
@@ -631,7 +784,13 @@ export default function App() {
         frontDesign={design.front}
         backDesign={design.back}
         selectedTechnique={selectedTechnique}
+        currentUser={currentUser}
+        onRequestAuth={(reason) => requireAuth(reason)}
         get3DCaptureUrl={capture3DRef.current ? () => capture3DRef.current!() : undefined}
+        onOpenRenderEngine={() => {
+          setIsExportOpen(false);
+          setCurrentView('render-engine');
+        }}
       />
 
       {/* SAVE / LOAD DESIGN */}
@@ -639,6 +798,8 @@ export default function App() {
         isOpen={isSaveOpen}
         onClose={() => setIsSaveOpen(false)}
         currentDesign={design}
+        currentUser={currentUser}
+        onRequestAuth={(reason) => requireAuth(reason)}
         onLoadDesign={(loaded) => {
           updateDesignWithHistory(loaded);
           const foundArt = catalog.find((a) => a.id === loaded.articleId) || catalog[0];
@@ -655,6 +816,15 @@ export default function App() {
       <AdminDashboard
         isOpen={isAdminOpen}
         onClose={() => setIsAdminOpen(false)}
+        currentUser={currentUser}
+        onOpenStudio={() => {
+          setIsAdminOpen(false);
+          setCurrentView('studio');
+        }}
+        onOpenRenderEngine={() => {
+          setIsAdminOpen(false);
+          setCurrentView('render-engine');
+        }}
         onCatalogUpdated={(newCat) => {
           setCatalog(newCat);
           const current = newCat.find((a) => a.id === selectedArticle.id);
@@ -666,6 +836,14 @@ export default function App() {
       <OrderTrackingModal
         isOpen={isTrackingOpen}
         onClose={() => setIsTrackingOpen(false)}
+      />
+
+      {/* AUTHENTICATION & LOGIN MODAL */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        reason={authReason}
+        onSuccess={handleAuthSuccess}
       />
     </div>
   );

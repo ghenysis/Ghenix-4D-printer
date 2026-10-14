@@ -41,27 +41,44 @@ import {
   Layers,
   Check,
   Eye,
-  Sliders
+  Sliders,
+  Building2
 } from 'lucide-react';
+import { UserProfile } from '../../types/auth';
+import { CompanyInfoEditor } from './CompanyInfoEditor';
 
 interface AdminDashboardProps {
   isOpen: boolean;
   onClose: () => void;
   onCatalogUpdated: (newCatalog: GarmentArticle[]) => void;
+  currentUser?: UserProfile | null;
+  onOpenStudio?: () => void;
+  onOpenRenderEngine?: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   isOpen,
   onClose,
-  onCatalogUpdated
+  onCatalogUpdated,
+  currentUser,
+  onOpenStudio,
+  onOpenRenderEngine
 }) => {
   // Authentication state (Security code: "atelier2026" or "admin")
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [authPin, setAuthPin] = useState('');
   const [authError, setAuthError] = useState(false);
 
-  // Active view tab: stats (KPIs), orders, catalog
-  const [adminTab, setAdminTab] = useState<'stats' | 'orders' | 'catalog'>('stats');
+  // Auto authenticate if current user is admin
+  useEffect(() => {
+    if (currentUser?.role === 'admin') {
+      setIsAuthenticated(true);
+      setAuthError(false);
+    }
+  }, [currentUser]);
+
+  // Active view tab: stats (KPIs), orders, catalog, company (landing dynamic info)
+  const [adminTab, setAdminTab] = useState<'stats' | 'orders' | 'catalog' | 'company'>('stats');
 
   // Time filter for KPIs: 'today' | '7days' | '30days' | 'all'
   const [timeFilter, setTimeFilter] = useState<'today' | '7days' | '30days' | 'all'>('all');
@@ -435,6 +452,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 >
                   <Package className="w-3.5 h-3.5" />
                   <span>Catalogue & Articles ({catalog.length})</span>
+                </button>
+                <button
+                  onClick={() => setAdminTab('company')}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg font-semibold transition-all ${
+                    adminTab === 'company'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  <Building2 className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Vitrine & Entreprise</span>
                 </button>
               </div>
 
@@ -1271,6 +1299,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 )}
               </div>
+            )}
+
+            {/* TAB 4: INFORMATIONS ENTREPRISE & VITRINE D'ACCUEIL */}
+            {adminTab === 'company' && (
+              <CompanyInfoEditor
+                onPreviewVitrine={onClose}
+              />
             )}
           </div>
         )}
