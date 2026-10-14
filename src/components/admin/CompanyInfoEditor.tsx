@@ -68,7 +68,7 @@ export const CompanyInfoEditor: React.FC<CompanyInfoEditorProps> = ({
       <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold text-[10px] uppercase tracking-wider">
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200 font-bold text-[10px] uppercase tracking-wider">
               Gestion Dynamique Sans Code
             </span>
             <span className="text-xs text-slate-400">
@@ -253,7 +253,7 @@ export const CompanyInfoEditor: React.FC<CompanyInfoEditorProps> = ({
         {/* SECTION 3: QUI SOMMES-NOUS & HISTOIRE */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-            <Sparkles className="w-4 h-4 text-indigo-500" />
+            <Sparkles className="w-4 h-4 text-amber-500" />
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">
               3. Présentation de l'Atelier "Qui Sommes-Nous"
             </h4>
@@ -340,7 +340,7 @@ export const CompanyInfoEditor: React.FC<CompanyInfoEditorProps> = ({
         {/* SECTION 5: STATISTIQUES CLÉS DE L'ATELIER */}
         <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-            <BarChart3 className="w-4 h-4 text-blue-600" />
+            <BarChart3 className="w-4 h-4 text-amber-500" />
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-900">
               5. Chiffres Clés & Statistiques Dynamiques (Affichés en vitrine)
             </h4>

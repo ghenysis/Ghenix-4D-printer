@@ -176,8 +176,8 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
 
           {/* USER ACCOUNT PILL */}
           {currentUser ? (
-            <div className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200/80 px-2 py-1 rounded-lg text-[11px] font-semibold text-slate-800 transition-colors">
-              <span className={`w-2 h-2 rounded-full ${currentUser.role === 'admin' ? 'bg-amber-500' : 'bg-blue-600'}`} />
+            <div className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200/80 px-2 py-1 rounded-lg text-[11px] font-semibold text-slate-800 transition-colors border border-slate-200/60">
+              <span className={`w-2 h-2 rounded-full ${currentUser.role === 'admin' ? 'bg-amber-500' : 'bg-slate-900'}`} />
               <span className="hidden sm:inline line-clamp-1 max-w-[90px]">
                 {currentUser.name.split(' ')[0]}
               </span>

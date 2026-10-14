@@ -174,16 +174,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <button
                 type="button"
                 onClick={() => handleQuickLogin('client')}
-                className="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-slate-900 hover:bg-slate-50 transition-all flex items-center justify-between group shadow-xs"
+                className="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-slate-800 hover:bg-slate-50 transition-all flex items-center justify-between group shadow-2xs"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
-                    <User className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center font-bold">
+                    <User className="w-5 h-5 text-slate-700" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-900">Compte Client</span>
-                      <span className="text-[10px] bg-blue-100 text-blue-800 font-semibold px-2 py-0.2 rounded-full">
+                      <span className="text-[10px] bg-slate-100 text-slate-700 font-bold px-2 py-0.2 rounded-full border border-slate-200">
                         Client Particulier & Pro
                       </span>
                     </div>
@@ -199,16 +199,16 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <button
                 type="button"
                 onClick={() => handleQuickLogin('admin')}
-                className="w-full text-left p-3.5 rounded-xl border border-amber-200 bg-amber-50/50 hover:border-amber-500 hover:bg-amber-50 transition-all flex items-center justify-between group shadow-xs"
+                className="w-full text-left p-3.5 rounded-xl border border-amber-200/80 bg-amber-50/30 hover:border-amber-400 hover:bg-amber-50/70 transition-all flex items-center justify-between group shadow-2xs"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-amber-200 text-amber-900 flex items-center justify-center font-bold">
-                    <Shield className="w-5 h-5" />
+                  <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-900 flex items-center justify-center font-bold">
+                    <Shield className="w-5 h-5 text-amber-700" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-xs font-bold text-slate-900">Chef d'Atelier (Admin)</span>
-                      <span className="text-[10px] bg-amber-200 text-amber-900 font-bold px-2 py-0.2 rounded-full">
+                      <span className="text-[10px] bg-amber-100 text-amber-900 font-bold px-2 py-0.2 rounded-full border border-amber-200">
                         Gestion complète
                       </span>
                     </div>
@@ -245,11 +245,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     onClick={() => setRole('admin')}
                     className={`py-2 px-3 rounded-lg border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
                       role === 'admin'
-                        ? 'border-amber-600 bg-amber-600 text-white shadow-xs'
+                        ? 'border-slate-900 bg-slate-900 text-white shadow-xs'
                         : 'border-slate-200 text-slate-700 hover:bg-slate-50'
                     }`}
                   >
-                    <Shield className="w-3.5 h-3.5" />
+                    <Shield className="w-3.5 h-3.5 text-amber-400" />
                     <span>Administrateur</span>
                   </button>
                 </div>
