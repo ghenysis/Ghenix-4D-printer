@@ -1,0 +1,6 @@
+{
+  "name": "Ghenix Customizer - Studio d'Impression Textile",
+  "description": "Configurateur professionnel de personnalisation textile 2D et 3D en temps réel, aperçu avec effet de vent, préparation des fichiers d'impression et gestion complète des commandes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
