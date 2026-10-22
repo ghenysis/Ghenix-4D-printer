@@ -177,4 +177,9 @@ export interface Order {
   history: OrderAuditEntry[];
   internalNotes?: string;
   productionFilesReady: boolean;
+  userId?: string;
+  prepStatus?: 'received' | 'printing' | 'ready';
+  deliveryStatus?: 'waiting' | 'assigned' | 'en_route' | 'delivered' | 'ready_pickup' | 'picked_up';
+  driverId?: string;
+  driverName?: string;
 }

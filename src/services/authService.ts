@@ -1,4 +1,5 @@
 import { UserProfile, UserRole } from '../types/auth';
+import { findUserByEmail, upsertUser } from './accountOps';
 
 const STORAGE_KEY_AUTH = 'ghenix_auth_user_v2';
 
@@ -19,6 +20,15 @@ export const DEMO_USERS: Record<UserRole, UserProfile> = {
     role: 'admin',
     phone: '01 42 68 55 00',
     company: 'Ghenix Atelier SARL',
+    createdAt: new Date().toISOString()
+  },
+  livreur: {
+    id: 'usr-driver-demo',
+    name: 'Léa Martin',
+    email: 'livreur@ghenix-atelier.fr',
+    role: 'livreur',
+    phone: '06 98 76 54 32',
+    company: 'Ghenix Livraison',
     createdAt: new Date().toISOString()
   }
 };
@@ -75,15 +85,21 @@ export function loginWithCredentials(
   company?: string,
   phone?: string
 ): UserProfile {
+  const known = findUserByEmail(email);
+  if (known && role !== 'admin') {
+    setCurrentUser(known);
+    return known;
+  }
   const user: UserProfile = {
     id: `usr-${Date.now()}`,
-    name: name.trim() || (role === 'admin' ? 'Administrateur' : 'Client Atelier'),
+    name: name.trim() || (role === 'admin' ? 'Administrateur' : role === 'livreur' ? 'Livreur' : 'Client Atelier'),
     email: email.trim() || 'utilisateur@example.com',
     role,
     company: company?.trim() || undefined,
     phone: phone?.trim() || undefined,
     createdAt: new Date().toISOString()
   };
+  upsertUser(user);
   setCurrentUser(user);
   return user;
 }

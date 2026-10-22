@@ -46,6 +46,7 @@ import {
 } from 'lucide-react';
 import { UserProfile } from '../../types/auth';
 import { CompanyInfoEditor } from './CompanyInfoEditor';
+import { OpsAdminPanel } from '../accounts/AccountSpaces';
 
 interface AdminDashboardProps {
   isOpen: boolean;
@@ -78,7 +79,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   }, [currentUser]);
 
   // Active view tab: stats (KPIs), orders, catalog, company (landing dynamic info)
-  const [adminTab, setAdminTab] = useState<'stats' | 'orders' | 'catalog' | 'company'>('stats');
+  const [adminTab, setAdminTab] = useState<'stats' | 'orders' | 'catalog' | 'company' | 'ops'>('stats');
 
   // Time filter for KPIs: 'today' | '7days' | '30days' | 'all'
   const [timeFilter, setTimeFilter] = useState<'today' | '7days' | '30days' | 'all'>('all');
@@ -452,6 +453,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 >
                   <Package className="w-3.5 h-3.5" />
                   <span>Catalogue & Articles ({catalog.length})</span>
+                </button>
+                <button
+                  onClick={() => setAdminTab('ops')}
+                  className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg font-semibold transition-all ${
+                    adminTab === 'ops'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  <Truck className="w-3.5 h-3.5" />
+                  <span>Tarifs & Livreurs</span>
                 </button>
                 <button
                   onClick={() => setAdminTab('company')}
@@ -1299,6 +1311,16 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   </div>
                 )}
               </div>
+            )}
+
+            {adminTab === 'ops' && (
+              <OpsAdminPanel
+                onCatalogPricesChanged={() => {
+                  const next = getStoredCatalog();
+                  setCatalog(next);
+                  onCatalogUpdated(next);
+                }}
+              />
             )}
 
             {/* TAB 4: INFORMATIONS ENTREPRISE & VITRINE D'ACCUEIL */}

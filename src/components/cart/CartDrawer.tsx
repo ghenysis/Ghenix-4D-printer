@@ -1,5 +1,6 @@
 import React from 'react';
 import { CartItem } from '../../types';
+import { quoteTotals } from '../../services/accountOps';
 import {
   X,
   Trash2,
@@ -30,9 +31,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const subtotal = items.reduce((acc, item) => acc + item.totalPrice, 0);
-  const tax = Math.round(subtotal * 0.2 * 100) / 100; // TVA 20%
-  const total = Math.round((subtotal + tax) * 100) / 100;
+  const quote = quoteTotals(items, 'workshop_pickup');
+  const subtotal = quote.subtotal;
+  const tax = quote.tax;
+  const total = quote.total;
+  const vatPct = Math.round(quote.vatRate * 100);
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden select-none">
@@ -148,7 +151,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <span className="font-mono">{subtotal.toFixed(2)} €</span>
                 </div>
                 <div className="flex justify-between text-slate-600">
-                  <span>TVA estimée (20%)</span>
+                  <span>TVA ({vatPct}%)</span>
                   <span className="font-mono">{tax.toFixed(2)} €</span>
                 </div>
                 <div className="flex justify-between font-bold text-sm text-slate-900 pt-2 border-t border-slate-100">

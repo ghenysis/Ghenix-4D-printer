@@ -24,6 +24,7 @@ interface TopNavbarProps {
   onOpenSave: () => void;
   onOpenAdmin: () => void;
   onOpenTracking: () => void;
+  onOpenSpace?: () => void;
   onOpenRenderEngine?: () => void;
   onBackToLanding?: () => void;
   currentUser?: UserProfile | null;
@@ -43,6 +44,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
   onOpenSave,
   onOpenAdmin,
   onOpenTracking,
+  onOpenSpace,
   onOpenRenderEngine,
   onBackToLanding,
   currentUser,
@@ -131,6 +133,20 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
           </button>
 
           <button
+            onClick={onOpenSpace}
+            className="flex items-center gap-1 hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
+          >
+            <User className="w-3 h-3" />
+            <span>
+              {currentUser?.role === 'livreur'
+                ? 'Livraisons'
+                : currentUser?.role === 'admin'
+                ? 'Espace'
+                : 'Mes commandes'}
+            </span>
+          </button>
+
+          <button
             onClick={onOpenTracking}
             className="flex items-center gap-1 hover:text-slate-900 transition-colors whitespace-nowrap shrink-0"
           >
@@ -177,7 +193,7 @@ export const TopNavbar: React.FC<TopNavbarProps> = ({
           {/* USER ACCOUNT PILL */}
           {currentUser ? (
             <div className="flex items-center gap-1 bg-slate-100 hover:bg-slate-200/80 px-2 py-1 rounded-lg text-[11px] font-semibold text-slate-800 transition-colors border border-slate-200/60">
-              <span className={`w-2 h-2 rounded-full ${currentUser.role === 'admin' ? 'bg-amber-500' : 'bg-slate-900'}`} />
+              <span className={`w-2 h-2 rounded-full ${currentUser.role === 'admin' ? 'bg-amber-500' : currentUser.role === 'livreur' ? 'bg-sky-500' : 'bg-slate-900'}`} />
               <span className="hidden sm:inline line-clamp-1 max-w-[90px]">
                 {currentUser.name.split(' ')[0]}
               </span>

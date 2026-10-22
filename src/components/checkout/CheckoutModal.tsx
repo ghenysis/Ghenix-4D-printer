@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { CartItem, CustomerDetails, Order } from '../../types';
-import { addOrder, generateOrderReference } from '../../services/storage';
+import { generateOrderReference } from '../../services/storage';
+import { placeLinkedOrder, quoteTotals } from '../../services/accountOps';
+import { setCurrentUser } from '../../services/authService';
 import { UserProfile } from '../../types/auth';
 import {
   X,
@@ -72,15 +74,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.totalPrice, 0);
-  const shippingCost =
-    customer.deliveryMethod === 'workshop_pickup'
-      ? 0
-      : customer.deliveryMethod === 'colissimo_standard'
-      ? 7.9
-      : 14.5;
-  const tax = Math.round((subtotal + shippingCost) * 0.2 * 100) / 100;
-  const total = Math.round((subtotal + shippingCost + tax) * 100) / 100;
+  const quote = quoteTotals(cartItems, customer.deliveryMethod);
+  const { subtotal, shippingCost, extras, tax, total, vatRate } = quote;
 
   // Validation
   const validateDetails = () => {
@@ -125,11 +120,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       productionFilesReady: true
     };
 
-    // Save to persistent orders store
-    addOrder(newOrder);
-    setConfirmedOrder(newOrder);
+    const { order: saved, user } = placeLinkedOrder(newOrder, customer);
+    if (!currentUser || currentUser.role !== 'admin') {
+      setCurrentUser(user.role === 'admin' ? currentUser || user : user);
+    }
+    setConfirmedOrder(saved);
     setStep('confirmation');
-    onOrderSuccess(newOrder);
+    onOrderSuccess(saved);
 
     // Fire celebratory confetti!
     try {
@@ -411,7 +408,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <span className="font-mono">{shippingCost.toFixed(2)} €</span>
                 </div>
                 <div className="flex justify-between text-slate-300">
-                  <span>TVA (20%)</span>
+                  <span>Frais</span>
+                  <span className="font-mono">{extras.toFixed(2)} €</span>
+                </div>
+                <div className="flex justify-between text-slate-300">
+                  <span>TVA ({Math.round(vatRate * 100)}%)</span>
                   <span className="font-mono">{tax.toFixed(2)} €</span>
                 </div>
                 <div className="flex justify-between font-bold text-base text-white pt-2 border-t border-white/20">
@@ -434,7 +435,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   Commande Transmise à l'Atelier !
                 </h4>
                 <p className="text-slate-500 mt-1 max-w-sm mx-auto">
-                  Votre référence de commande unique est générée et consultable par notre équipe d'impression.
+                  Votre compte reprend cette commande, l'historique et le suivi (préparation, livraison ou retrait magasin).
                 </p>
               </div>
 

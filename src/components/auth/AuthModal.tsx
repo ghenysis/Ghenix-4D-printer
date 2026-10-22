@@ -219,6 +219,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
                 <ArrowRight className="w-4 h-4 text-amber-700 group-hover:text-amber-900 group-hover:translate-x-0.5 transition-all" />
               </button>
+
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('livreur')}
+                className="w-full text-left p-3.5 rounded-xl border border-sky-200 hover:border-sky-500 hover:bg-sky-50 transition-all flex items-center justify-between group"
+              >
+                <div>
+                  <span className="text-xs font-bold text-slate-900">Livreur</span>
+                  <p className="text-[11px] text-slate-500 mt-0.5">Léa Martin · tournées attribuées</p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-sky-600" />
+              </button>
             </div>
           ) : (
             /* MANUAL FORM */
@@ -227,7 +239,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Type de profil :
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => setRole('client')}
@@ -251,6 +263,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   >
                     <Shield className="w-3.5 h-3.5 text-amber-400" />
                     <span>Administrateur</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRole('livreur')}
+                    className={`py-2 px-2 rounded-lg border text-xs font-semibold flex items-center justify-center gap-1 transition-all ${
+                      role === 'livreur'
+                        ? 'border-slate-900 bg-slate-900 text-white shadow-xs'
+                        : 'border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span>Livreur</span>
                   </button>
                 </div>
               </div>

@@ -33,6 +33,7 @@ import { OrderTrackingModal } from './components/tracking/OrderTrackingModal';
 import { RenderEngineView } from './components/render-engine/RenderEngineView';
 import { LandingPage } from './components/landing/LandingPage';
 import { AuthModal, AuthReason } from './components/auth/AuthModal';
+import { ClientOrdersModal, DriverBoardModal } from './components/accounts/AccountSpaces';
 import { UserProfile } from './types/auth';
 import { getCurrentUser, subscribeToAuth } from './services/authService';
 import { useConfigurator } from './store/useConfigurator';
@@ -203,6 +204,7 @@ export default function App() {
   const [isSaveOpen, setIsSaveOpen] = useState(false);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isTrackingOpen, setIsTrackingOpen] = useState(false);
+  const [isSpaceOpen, setIsSpaceOpen] = useState(false);
 
   // 3D Screenshot capture function ref
   const capture3DRef = useRef<(() => string) | null>(null);
@@ -433,6 +435,7 @@ export default function App() {
     saveCart(updatedCart);
 
     setAddedNotice(true);
+    setIsCartOpen(true);
     setTimeout(() => setAddedNotice(false), 2500);
   };
 
@@ -533,6 +536,8 @@ export default function App() {
           isOpen={isTrackingOpen}
           onClose={() => setIsTrackingOpen(false)}
         />
+        <ClientOrdersModal isOpen={isSpaceOpen && currentUser?.role !== 'livreur'} onClose={() => setIsSpaceOpen(false)} user={currentUser} />
+        <DriverBoardModal isOpen={isSpaceOpen && currentUser?.role === 'livreur'} onClose={() => setIsSpaceOpen(false)} user={currentUser} />
       </>
     );
   }
@@ -594,6 +599,13 @@ export default function App() {
             }
           }}
           onOpenTracking={() => setIsTrackingOpen(true)}
+          onOpenSpace={() => {
+            if (!currentUser) {
+              requireAuth('general', () => setIsSpaceOpen(true));
+              return;
+            }
+            setIsSpaceOpen(true);
+          }}
           onOpenRenderEngine={() => setCurrentView('render-engine')}
           onBackToLanding={() => setCurrentView('landing')}
           currentUser={currentUser}
@@ -837,6 +849,8 @@ export default function App() {
         isOpen={isTrackingOpen}
         onClose={() => setIsTrackingOpen(false)}
       />
+      <ClientOrdersModal isOpen={isSpaceOpen && currentUser?.role !== 'livreur'} onClose={() => setIsSpaceOpen(false)} user={currentUser} />
+      <DriverBoardModal isOpen={isSpaceOpen && currentUser?.role === 'livreur'} onClose={() => setIsSpaceOpen(false)} user={currentUser} />
 
       {/* AUTHENTICATION & LOGIN MODAL */}
       <AuthModal
