@@ -154,6 +154,7 @@ export const DriverBoardModal: React.FC<{
 export const OpsAdminPanel: React.FC<{ onCatalogPricesChanged?: () => void }> = ({ onCatalogPricesChanged }) => {
   const [pricing, setPricing] = useState<PricingConfig>(getPricing());
   const [orders, setOrders] = useState<Order[]>([]);
+  const [drivers, setDrivers] = useState<UserProfile[]>([]);
   const [accounts, setAccounts] = useState<UserProfile[]>([]);
   const [accountFilter, setAccountFilter] = useState<'all' | 'admin' | 'client' | 'livreur'>('all');
   const [catalog, setCatalog] = useState(getStoredCatalog());
