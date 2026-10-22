@@ -9,6 +9,9 @@ export interface UserProfile {
   company?: string;
   avatarUrl?: string;
   createdAt: string;
+  /** Identifiant lisible du compte, ex. ADM-0001 */
+  accountCode?: string;
+  active?: boolean;
 }
 
 export interface CompanyCommitment {

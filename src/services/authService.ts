@@ -11,6 +11,8 @@ export const DEMO_USERS: Record<UserRole, UserProfile> = {
     role: 'client',
     phone: '06 12 34 56 78',
     company: 'Studio Pulse Textile',
+    accountCode: 'CLI-0001',
+    active: true,
     createdAt: new Date().toISOString()
   },
   admin: {
@@ -20,6 +22,8 @@ export const DEMO_USERS: Record<UserRole, UserProfile> = {
     role: 'admin',
     phone: '01 42 68 55 00',
     company: 'Ghenix Atelier SARL',
+    accountCode: 'ADM-0001',
+    active: true,
     createdAt: new Date().toISOString()
   },
   livreur: {
@@ -29,6 +33,8 @@ export const DEMO_USERS: Record<UserRole, UserProfile> = {
     role: 'livreur',
     phone: '06 98 76 54 32',
     company: 'Ghenix Livraison',
+    accountCode: 'LIV-0001',
+    active: true,
     createdAt: new Date().toISOString()
   }
 };
@@ -73,7 +79,7 @@ export function setCurrentUser(user: UserProfile | null): void {
 }
 
 export function loginQuick(role: UserRole): UserProfile {
-  const user = DEMO_USERS[role];
+  const user = upsertUser(DEMO_USERS[role]);
   setCurrentUser(user);
   return user;
 }

@@ -213,7 +213,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                       </span>
                     </div>
                     <p className="text-[11px] text-slate-500 mt-0.5">
-                      Marc Delorme • Accès commandes & vitrine
+                      Marc Delorme • Identifiant ADM-0001
                     </p>
                   </div>
                 </div>

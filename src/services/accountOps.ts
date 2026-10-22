@@ -71,13 +71,49 @@ function saveUsers(users: UserProfile[]) {
   localStorage.setItem(USERS_KEY, JSON.stringify(users));
 }
 
+const CODE_PREFIX: Record<UserRole, string> = {
+  admin: 'ADM',
+  client: 'CLI',
+  livreur: 'LIV'
+};
+
+export function allocateAccountCode(role: UserRole, users = getUsers()): string {
+  const prefix = CODE_PREFIX[role];
+  const max = users.reduce((n, u) => {
+    const m = u.accountCode?.match(new RegExp(`^${prefix}-(\\d+)$`));
+    return m ? Math.max(n, Number(m[1])) : n;
+  }, 0);
+  return `${prefix}-${String(max + 1).padStart(4, '0')}`;
+}
+
 export function upsertUser(user: UserProfile): UserProfile {
   const users = getUsers();
   const idx = users.findIndex((u) => u.email.toLowerCase() === user.email.toLowerCase() || u.id === user.id);
-  if (idx >= 0) users[idx] = { ...users[idx], ...user };
-  else users.unshift(user);
+  const withCode: UserProfile = {
+    ...user,
+    accountCode: user.accountCode || (idx >= 0 ? users[idx].accountCode : undefined) || allocateAccountCode(user.role, users),
+    active: user.active !== undefined ? user.active : idx >= 0 ? users[idx].active !== false : true
+  };
+  if (idx >= 0) users[idx] = { ...users[idx], ...withCode };
+  else users.unshift(withCode);
   saveUsers(users);
-  return idx >= 0 ? users[idx] : user;
+  return idx >= 0 ? users[idx] : withCode;
+}
+
+export function updateAccount(
+  id: string,
+  patch: Partial<Pick<UserProfile, 'name' | 'phone' | 'company' | 'role' | 'active'>>
+): UserProfile | null {
+  const users = getUsers();
+  const idx = users.findIndex((u) => u.id === id);
+  if (idx < 0) return null;
+  const next = { ...users[idx], ...patch };
+  if (patch.role && patch.role !== users[idx].role) {
+    next.accountCode = allocateAccountCode(patch.role, users.filter((u) => u.id !== id));
+  }
+  users[idx] = next;
+  saveUsers(users);
+  return next;
 }
 
 export function findUserByEmail(email: string): UserProfile | undefined {

@@ -8,6 +8,7 @@ import {
   deliveryOf,
   fulfillmentOf,
   getPricing,
+  getUsers,
   listByRole,
   ordersForDriver,
   ordersForUser,
@@ -17,6 +18,7 @@ import {
   setDeliveryTask,
   setPrepStatus,
   assignDriver,
+  updateAccount,
   ExtraFee,
   PricingConfig
 } from '../../services/accountOps';
@@ -152,7 +154,8 @@ export const DriverBoardModal: React.FC<{
 export const OpsAdminPanel: React.FC<{ onCatalogPricesChanged?: () => void }> = ({ onCatalogPricesChanged }) => {
   const [pricing, setPricing] = useState<PricingConfig>(getPricing());
   const [orders, setOrders] = useState<Order[]>([]);
-  const [drivers, setDrivers] = useState<UserProfile[]>([]);
+  const [accounts, setAccounts] = useState<UserProfile[]>([]);
+  const [accountFilter, setAccountFilter] = useState<'all' | 'admin' | 'client' | 'livreur'>('all');
   const [catalog, setCatalog] = useState(getStoredCatalog());
   const [driverForm, setDriverForm] = useState({ name: '', email: '', phone: '' });
   const [feeLabel, setFeeLabel] = useState('');
@@ -163,6 +166,7 @@ export const OpsAdminPanel: React.FC<{ onCatalogPricesChanged?: () => void }> = 
     setPricing(getPricing());
     setOrders(getStoredOrders());
     setDrivers(listByRole('livreur'));
+    setAccounts(getUsers());
     setCatalog(getStoredCatalog());
   };
   useEffect(() => { reload(); }, []);
@@ -175,6 +179,64 @@ export const OpsAdminPanel: React.FC<{ onCatalogPricesChanged?: () => void }> = 
 
   return (
     <div className="p-4 sm:p-6 space-y-6 text-xs overflow-y-auto">
+      <section className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-bold">Comptes</h3>
+            <p className="text-[11px] text-slate-500">Identifiant admin de référence : <b className="font-mono">ADM-0001</b></p>
+          </div>
+          <select className="border rounded-lg px-2 py-1" value={accountFilter} onChange={(e) => setAccountFilter(e.target.value as typeof accountFilter)}>
+            <option value="all">Tous</option>
+            <option value="admin">Admins</option>
+            <option value="client">Clients</option>
+            <option value="livreur">Livreurs</option>
+          </select>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left">
+            <thead className="text-[10px] uppercase text-slate-400">
+              <tr>
+                <th className="py-1 pr-2">Identifiant</th>
+                <th className="py-1 pr-2">Nom</th>
+                <th className="py-1 pr-2">Rôle</th>
+                <th className="py-1 pr-2">État</th>
+              </tr>
+            </thead>
+            <tbody>
+              {accounts.filter((a) => accountFilter === 'all' || a.role === accountFilter).map((a) => (
+                <tr key={a.id} className="border-t border-slate-100">
+                  <td className="py-2 pr-2 font-mono font-bold">{a.accountCode || '—'}</td>
+                  <td className="py-2 pr-2">
+                    <div>{a.name}</div>
+                    <div className="text-slate-400">{a.email}</div>
+                  </td>
+                  <td className="py-2 pr-2">
+                    <select
+                      className="border rounded-lg px-1 py-1"
+                      value={a.role}
+                      onChange={(e) => { updateAccount(a.id, { role: e.target.value as UserProfile['role'] }); reload(); }}
+                    >
+                      <option value="client">Client</option>
+                      <option value="livreur">Livreur</option>
+                      <option value="admin">Admin</option>
+                    </select>
+                  </td>
+                  <td className="py-2">
+                    <button
+                      className={`px-2 py-1 rounded-lg ${a.active === false ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-800'}`}
+                      onClick={() => { updateAccount(a.id, { active: a.active === false }); reload(); }}
+                    >
+                      {a.active === false ? 'Inactif' : 'Actif'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {accounts.length === 0 && <p className="text-slate-500">Aucun compte enregistré. Une commande ou une connexion en crée un.</p>}
+        </div>
+      </section>
+
       <section className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
         <h3 className="text-sm font-bold">Tarification</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
