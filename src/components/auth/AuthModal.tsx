@@ -14,7 +14,7 @@ import {
   ShoppingBag
 } from 'lucide-react';
 import { UserProfile, UserRole } from '../../types/auth';
-import { loginQuick, loginWithCredentials } from '../../services/authService';
+import { loginQuick, loginWithCredentials, loginWithIdentifier, ADMIN_ACCOUNT_CODE } from '../../services/authService';
 
 export type AuthReason = 'download' | 'save' | 'order' | 'admin' | 'general';
 
@@ -37,6 +37,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [email, setEmail] = useState('');
   const [company, setCompany] = useState('');
   const [adminPin, setAdminPin] = useState('');
+  const [identifier, setIdentifier] = useState(reason === 'admin' ? ADMIN_ACCOUNT_CODE : '');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -50,6 +51,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+
+    if (identifier.trim()) {
+      try {
+        const user = loginWithIdentifier(identifier, role === 'admin' ? adminPin : undefined);
+        if (onSuccess) onSuccess(user);
+        onClose();
+      } catch (err) {
+        setErrorMsg(err instanceof Error ? err.message : 'Connexion impossible.');
+      }
+      return;
+    }
 
     if (role === 'admin' && adminPin.trim() !== 'atelier2026' && adminPin.trim() !== 'admin') {
       setErrorMsg('Code de sécurité administrateur incorrect (code : atelier2026)');
@@ -280,6 +292,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               <div>
                 <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                  Identifiant :
+                </label>
+                <input
+                  type="text"
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
+                  placeholder="ADM-0001"
+                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-none font-mono"
+                />
+                <p className="text-[10px] text-slate-400 mt-1">Admin : ADM-0001 · Client : CLI-0001 · Livreur : LIV-0001</p>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1">
                   Nom complet :
                 </label>
                 <input
@@ -288,7 +314,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Ex : Sarah Laurent"
                   className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-none"
-                  required
                 />
               </div>
 
@@ -302,7 +327,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="votre.email@exemple.com"
                   className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-900 focus:outline-none"
-                  required
                 />
               </div>
 

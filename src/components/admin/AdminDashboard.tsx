@@ -463,7 +463,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   }`}
                 >
                   <Truck className="w-3.5 h-3.5" />
-                  <span>Tarifs & Livreurs</span>
+                  <span>Comptes & Tarifs</span>
                 </button>
                 <button
                   onClick={() => setAdminTab('company')}

@@ -120,6 +120,16 @@ export function findUserByEmail(email: string): UserProfile | undefined {
   return getUsers().find((u) => u.email.toLowerCase() === email.trim().toLowerCase());
 }
 
+export function findUserByCode(code: string): UserProfile | undefined {
+  const key = code.trim().toUpperCase();
+  return getUsers().find((u) => u.accountCode?.toUpperCase() === key);
+}
+
+export function ensureDemoAccounts(demos: UserProfile[]): UserProfile[] {
+  demos.forEach((d) => upsertUser(d));
+  return getUsers();
+}
+
 export function listByRole(role: UserRole): UserProfile[] {
   return getUsers().filter((u) => u.role === role);
 }

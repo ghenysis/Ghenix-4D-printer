@@ -23,6 +23,7 @@ import {
   PricingConfig
 } from '../../services/accountOps';
 import { getStoredCatalog, getStoredOrders } from '../../services/storage';
+import { seedAccounts } from '../../services/authService';
 import { X } from 'lucide-react';
 
 const PREP_LABEL: Record<PrepStatus, string> = {
@@ -164,6 +165,7 @@ export const OpsAdminPanel: React.FC<{ onCatalogPricesChanged?: () => void }> = 
   const [kindFilter, setKindFilter] = useState<'all' | 'delivery' | 'pickup'>('all');
 
   const reload = () => {
+    seedAccounts();
     setPricing(getPricing());
     setOrders(getStoredOrders());
     setDrivers(listByRole('livreur'));

@@ -1,5 +1,5 @@
 import { UserProfile, UserRole } from '../types/auth';
-import { findUserByEmail, upsertUser } from './accountOps';
+import { ensureDemoAccounts, findUserByCode, findUserByEmail, upsertUser } from './accountOps';
 
 const STORAGE_KEY_AUTH = 'ghenix_auth_user_v2';
 
@@ -76,6 +76,32 @@ export function setCurrentUser(user: UserProfile | null): void {
     localStorage.removeItem(STORAGE_KEY_AUTH);
   }
   notifyListeners(user);
+}
+
+export const ADMIN_ACCOUNT_CODE = 'ADM-0001';
+export const ADMIN_PIN = 'atelier2026';
+
+export function seedAccounts(): void {
+  ensureDemoAccounts(Object.values(DEMO_USERS));
+}
+
+export function loginWithIdentifier(identifier: string, pin?: string): UserProfile {
+  seedAccounts();
+  const key = identifier.trim();
+  const byCode = findUserByCode(key);
+  const byEmail = findUserByEmail(key);
+  const known = byCode || byEmail;
+  if (!known) {
+    throw new Error('Identifiant inconnu.');
+  }
+  if (known.active === false) {
+    throw new Error('Ce compte est désactivé.');
+  }
+  if (known.role === 'admin' && pin?.trim() !== ADMIN_PIN && pin?.trim() !== 'admin') {
+    throw new Error('Code administrateur incorrect.');
+  }
+  setCurrentUser(known);
+  return known;
 }
 
 export function loginQuick(role: UserRole): UserProfile {
