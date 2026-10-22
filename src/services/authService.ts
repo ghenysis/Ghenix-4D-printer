@@ -12,6 +12,7 @@ export const DEMO_USERS: Record<UserRole, UserProfile> = {
     phone: '06 12 34 56 78',
     company: 'Studio Pulse Textile',
     accountCode: 'CLI-0001',
+    password: 'client1234',
     active: true,
     createdAt: new Date().toISOString()
   },
@@ -23,6 +24,7 @@ export const DEMO_USERS: Record<UserRole, UserProfile> = {
     phone: '01 42 68 55 00',
     company: 'Ghenix Atelier SARL',
     accountCode: 'ADM-0001',
+    password: 'atelier2026',
     active: true,
     createdAt: new Date().toISOString()
   },
@@ -34,6 +36,7 @@ export const DEMO_USERS: Record<UserRole, UserProfile> = {
     phone: '06 98 76 54 32',
     company: 'Ghenix Livraison',
     accountCode: 'LIV-0001',
+    password: 'livreur1234',
     active: true,
     createdAt: new Date().toISOString()
   }
@@ -85,23 +88,33 @@ export function seedAccounts(): void {
   ensureDemoAccounts(Object.values(DEMO_USERS));
 }
 
-export function loginWithIdentifier(identifier: string, pin?: string): UserProfile {
+export function loginWithPassword(identifier: string, password: string): UserProfile {
   seedAccounts();
   const key = identifier.trim();
-  const byCode = findUserByCode(key);
-  const byEmail = findUserByEmail(key);
-  const known = byCode || byEmail;
-  if (!known) {
-    throw new Error('Identifiant inconnu.');
-  }
-  if (known.active === false) {
-    throw new Error('Ce compte est désactivé.');
-  }
-  if (known.role === 'admin' && pin?.trim() !== ADMIN_PIN && pin?.trim() !== 'admin') {
-    throw new Error('Code administrateur incorrect.');
+  const known = findUserByCode(key) || findUserByEmail(key);
+  if (!known || known.active === false || !password || known.password !== password) {
+    throw new Error('Identifiant ou mot de passe incorrect.');
   }
   setCurrentUser(known);
   return known;
+}
+
+export function registerClientAccount(name: string, email: string, password: string): UserProfile {
+  seedAccounts();
+  if (!email.includes('@')) throw new Error('Adresse email invalide.');
+  if (password.trim().length < 6) throw new Error('Mot de passe trop court (6 caractères minimum).');
+  if (findUserByEmail(email)) throw new Error('Un compte existe déjà avec cet email. Connectez-vous.');
+  const user = upsertUser({
+    id: `usr-${Date.now()}`,
+    name: name.trim() || 'Client',
+    email: email.trim(),
+    role: 'client',
+    password: password.trim(),
+    active: true,
+    createdAt: new Date().toISOString()
+  });
+  setCurrentUser(user);
+  return user;
 }
 
 export function loginQuick(role: UserRole): UserProfile {

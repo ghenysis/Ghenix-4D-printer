@@ -12,6 +12,7 @@ export interface UserProfile {
   /** Identifiant lisible du compte, ex. ADM-0001 */
   accountCode?: string;
   active?: boolean;
+  password?: string;
 }
 
 export interface CompanyCommitment {

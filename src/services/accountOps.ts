@@ -92,7 +92,8 @@ export function upsertUser(user: UserProfile): UserProfile {
   const withCode: UserProfile = {
     ...user,
     accountCode: user.accountCode || (idx >= 0 ? users[idx].accountCode : undefined) || allocateAccountCode(user.role, users),
-    active: user.active !== undefined ? user.active : idx >= 0 ? users[idx].active !== false : true
+    active: user.active !== undefined ? user.active : idx >= 0 ? users[idx].active !== false : true,
+    password: user.password || (idx >= 0 ? users[idx].password : undefined)
   };
   if (idx >= 0) users[idx] = { ...users[idx], ...withCode };
   else users.unshift(withCode);
@@ -248,7 +249,7 @@ export function setPrepStatus(orderId: string, prep: PrepStatus, author = 'Ateli
   return patchOrder(orderId, { prepStatus: prep, status }, `Préparation : ${prep}`, author);
 }
 
-export function createDriver(input: { name: string; email: string; phone?: string }): UserProfile {
+export function createDriver(input: { name: string; email: string; phone?: string; password?: string }): UserProfile {
   const existing = findUserByEmail(input.email);
   const user: UserProfile = {
     id: existing?.id || `drv-${Date.now()}`,
@@ -257,6 +258,7 @@ export function createDriver(input: { name: string; email: string; phone?: strin
     role: 'livreur',
     phone: input.phone?.trim(),
     company: 'Ghenix Livraison',
+    password: input.password?.trim() || existing?.password,
     createdAt: existing?.createdAt || new Date().toISOString()
   };
   return upsertUser(user);

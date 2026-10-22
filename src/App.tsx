@@ -82,7 +82,10 @@ export default function App() {
       const act = pendingAuthAction;
       setPendingAuthAction(null);
       act();
+      return;
     }
+    if (user.role === 'admin') setIsAdminOpen(true);
+    else setIsSpaceOpen(true);
   };
 
   // Catalog & Product Selection

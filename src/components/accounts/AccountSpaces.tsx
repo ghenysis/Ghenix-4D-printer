@@ -159,7 +159,7 @@ export const OpsAdminPanel: React.FC<{ onCatalogPricesChanged?: () => void }> = 
   const [accounts, setAccounts] = useState<UserProfile[]>([]);
   const [accountFilter, setAccountFilter] = useState<'all' | 'admin' | 'client' | 'livreur'>('all');
   const [catalog, setCatalog] = useState(getStoredCatalog());
-  const [driverForm, setDriverForm] = useState({ name: '', email: '', phone: '' });
+  const [driverForm, setDriverForm] = useState({ name: '', email: '', phone: '', password: '' });
   const [feeLabel, setFeeLabel] = useState('');
   const [feeAmount, setFeeAmount] = useState('0');
   const [kindFilter, setKindFilter] = useState<'all' | 'delivery' | 'pickup'>('all');
@@ -310,12 +310,13 @@ export const OpsAdminPanel: React.FC<{ onCatalogPricesChanged?: () => void }> = 
           <input className="border rounded-lg px-2 py-1.5" placeholder="Nom" value={driverForm.name} onChange={(e) => setDriverForm({ ...driverForm, name: e.target.value })} />
           <input className="border rounded-lg px-2 py-1.5" placeholder="Email" value={driverForm.email} onChange={(e) => setDriverForm({ ...driverForm, email: e.target.value })} />
           <input className="border rounded-lg px-2 py-1.5" placeholder="Téléphone" value={driverForm.phone} onChange={(e) => setDriverForm({ ...driverForm, phone: e.target.value })} />
+          <input className="border rounded-lg px-2 py-1.5" placeholder="Mot de passe" type="password" value={driverForm.password} onChange={(e) => setDriverForm({ ...driverForm, password: e.target.value })} />
           <button
             className="bg-slate-900 text-white rounded-lg font-bold"
             onClick={() => {
-              if (!driverForm.name.trim() || !driverForm.email.trim()) return;
+              if (!driverForm.name.trim() || !driverForm.email.trim() || driverForm.password.trim().length < 6) return;
               createDriver(driverForm);
-              setDriverForm({ name: '', email: '', phone: '' });
+              setDriverForm({ name: '', email: '', phone: '', password: '' });
               reload();
             }}
           >Créer</button>
